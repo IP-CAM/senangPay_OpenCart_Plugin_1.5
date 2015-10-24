@@ -3,52 +3,65 @@ class ControllerPaymentSenangpay extends Controller
 {
     public function index()
     {
-        $data['button_confirm'] = $this->language->get('button_confirm');
+        $this->data['button_confirm'] = $this->language->get('button_confirm');
 
-        $data['continue'] = $this->url->link('checkout/success');
+        $this->data['continue'] = $this->url->link('checkout/success');
         
         # Prepare the data to send to senangPay
-        $data['senangpay_url'] = 'https://app.senangpay.my/payment/'.$this->config->get('senangpay_merchant_id');
-        $data['senangpay_order_id'] = $this->session->data['order_id'];
-        $data['senangpay_detail'] = "Payment_for_order_".$this->session->data['order_id'];
+        $this->data['senangpay_url'] = 'https://app.senangpay.my/payment/'.$this->config->get('senangpay_merchant_id');
+        $this->data['senangpay_order_id'] = $this->session->data['order_id'];
+        $this->data['senangpay_detail'] = "Payment_for_order_".$this->session->data['order_id'];
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        $data['senangpay_amount'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
+        $this->data['senangpay_amount'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
         # need to strip the $ and comma
-        $data['senangpay_amount'] = str_replace('$', '', $data['senangpay_amount']);
-        $data['senangpay_amount'] = str_replace(',', '', $data['senangpay_amount']);
-        $data['senangpay_hash'] = md5($this->config->get('senangpay_secret_key').$data['senangpay_detail'].$data['senangpay_amount'].$this->session->data['order_id']);
+        $this->data['senangpay_amount'] = str_replace('$', '', $this->data['senangpay_amount']);
+        $this->data['senangpay_amount'] = str_replace(',', '', $this->data['senangpay_amount']);
+        $this->data['senangpay_hash'] = md5($this->config->get('senangpay_secret_key').$this->data['senangpay_detail'].$this->data['senangpay_amount'].$this->session->data['order_id']);
 
-        if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/senangpay.tpl'))
-            return $this->load->view($this->config->get('config_template') . '/template/payment/senangpay.tpl', $data);
+        /*if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/senangpay.tpl'))
+            return $this->load->view($this->config->get('config_template') . '/template/payment/senangpay.tpl', $this->data);
         else
-            return $this->load->view('default/template/payment/custom.tpl', $data);
+            return $this->load->view('default/template/payment/custom.tpl', $this->data);*/
+
+            if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/senangpay.tpl')) {
+                $this->template = $this->config->get('config_template') . '/template/payment/senangpay.tpl';
+            } else {
+                $this->template = 'default/template/payment/senangpay.tpl';
+            }
+
+            $this->render();
     }
+
     
     public function callback()
     {
+       
         $this->load->language('payment/senangpay');
         $this->document->setTitle($this->language->get('text_payment_title'));
         //$this->data['heading_title'] = $this->language->get('text_payment_title');
 
-        $data['breadcrumbs'] = array();
+        $this->data['breadcrumbs'] = array();
 
-        $data['breadcrumbs'][] = array(
+        $this->data['breadcrumbs'][] = array(
                 'text' => $this->language->get('text_home'),
-                'href' => $this->url->link('common/home')
+                'href' => $this->url->link('common/home'),
+                'separator' => false
         );
-        $data['breadcrumbs'][] = array(
+        $this->data['breadcrumbs'][] = array(
                 'text' => $this->language->get('text_payment_title'),
-                'href' => $this->url->link('checkout/checkout')
+                'href' => $this->url->link('checkout/checkout'),
+                'separator' => $this->language->get('text_separator')
         );
         
-        $data['column_left'] = $this->load->controller('common/column_left');
-	$data['column_right'] = $this->load->controller('common/column_right');
-	$data['content_top'] = $this->load->controller('common/content_top');
-	$data['content_bottom'] = $this->load->controller('common/content_bottom');
-	$data['footer'] = $this->load->controller('common/footer');
-	$data['header'] = $this->load->controller('common/header');
+    /*$this->data['column_left'] = $this->load->controller('common/column_left');
+	$this->data['column_right'] = $this->load->controller('common/column_right');
+	$this->data['content_top'] = $this->load->controller('common/content_top');
+	$this->data['content_bottom'] = $this->load->controller('common/content_bottom');
+	$this->data['footer'] = $this->load->controller('common/footer');
+	$this->data['header'] = $this->load->controller('common/header');*/
       
         $transaction_status = false;
+
         if(isset($this->request->get['status_id']) && isset($this->request->get['order_id']) && isset($this->request->get['msg']) && isset($this->request->get['transaction_id']) && isset($this->request->get['hash']))
         {
             $status_id = urldecode($this->request->get['status_id']);
@@ -67,26 +80,64 @@ class ControllerPaymentSenangpay extends Controller
                     if($status_id == '1' || $status_id == 1)
                     {
                         $transaction_status = true;
-                        $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id, false);
+                         
+                        //todo: Need to fix this part
+                        /*$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id, false);*/
+
+                        if (!$order_info['order_status_id']) {
+                            $this->model_checkout_order->confirm($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+                        } else {
+                            $this->model_checkout_order->update($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+                        }
+
                         if($this->cart->hasProducts())
                             $this->cart->clear();
                         
-                        $data['continue'] = $this->url->link('checkout/success');
-                        $data['text_payment_status'] = $this->language->get('text_payment_successful');
-                        $data['color'] = 'green';
-                    }
+                        $this->data['continue'] = $this->url->link('checkout/success');
+                        $this->data['text_payment_status'] = $this->language->get('text_payment_successful');
+                        $this->data['color'] = 'green';
+                        $this->data['button_continue'] = $this->language->get('button_success_continue');
+
+                    } 
                 }
             }
         }
+
         
         if(!$transaction_status)
         {
-            $data['continue'] = $this->url->link('checkout/cart');
-            $data['text_payment_status'] = $this->language->get('text_payment_failed');
-            $data['color'] = 'red';
+            if (!$order_info['order_status_id']) {
+                $this->model_checkout_order->confirm($order_id, $this->config->get('senangpay_order_fail_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+            } else {
+                $this->model_checkout_order->update($order_id, $this->config->get('senangpay_order_fail_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+            }
+
+            $this->data['continue'] = $this->url->link('checkout/cart');
+            $this->data['text_payment_status'] = $this->language->get('text_payment_failed');
+            $this->data['color'] = 'red';
+            $this->data['button_continue'] = $this->language->get('button_fail_continue');
         }
         
-        $data['text_payment_title'] = $this->language->get('text_payment_title');
-        $this->response->setOutput($this->load->view('default/template/payment/senangpay_status.tpl', $data));
+        $this->data['text_payment_title'] = $this->language->get('text_payment_title');
+
+        //$this->response->setOutput($this->load->view('default/template/payment/senangpay_status.tpl', $this->data));
+
+
+        if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/senangpay_status.tpl')) {
+                $this->template = $this->config->get('config_template') . '/template/payment/senangpay_status.tpl';
+            } else {
+                $this->template = 'default/template/payment/senangpay_status.tpl';
+            }
+            $this->children = array(
+                'common/column_left',
+                'common/column_right',
+                'common/content_top',
+                'common/content_bottom',
+                'common/footer',
+                'common/header'
+            );
+                    
+            $this->response->setOutput($this->render());
+
     }
 }
