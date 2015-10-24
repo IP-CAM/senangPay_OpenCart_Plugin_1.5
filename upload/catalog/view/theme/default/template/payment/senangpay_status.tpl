@@ -1,29 +1,16 @@
-<?php echo $header; ?>
-<div class="container">
-    <ul class="breadcrumb">
+
+
+<?php echo $header; ?><?php echo $column_left; ?><?php echo $column_right; ?>
+<div id="content"><?php echo $content_top; ?>
+  <div class="breadcrumb">
     <?php foreach ($breadcrumbs as $breadcrumb) { ?>
-        <li><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a></li>
+    <?php echo $breadcrumb['separator']; ?><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
     <?php } ?>
-    </ul>
-    <div class="row"><?php echo $column_left; ?>
-        <?php if ($column_left && $column_right) { ?>
-        <?php $class = 'col-sm-6'; ?>
-        <?php } elseif ($column_left || $column_right) { ?>
-        <?php $class = 'col-sm-9'; ?>
-        <?php } else { ?>
-        <?php $class = 'col-sm-12'; ?>
-        <?php } ?>
-        <div id="content" class="<?php echo $class; ?>"><?php echo $content_top; ?>
-            <h1><?php echo $text_payment_title; ?></h1>
-            <div style="color: <?php echo $color; ?>"><?php echo $text_payment_status; ?></div>
-            <div class="buttons">
-                <div class="pull">
-                    <br><br>
-                    <a href="<?php echo $continue; ?>" class="btn btn-primary"/>Continue</a>
-                </div>
-            </div>
-        </div>
-        <?php echo $column_right; ?>
-    </div>
-</div>
+  </div>
+  <h1><?php echo $text_payment_title; ?></h1>
+  <div class="content"><div style="color: <?php echo $color; ?>"><?php echo $text_payment_status; ?></div></div>
+  <div class="buttons">
+    <div class="right"><a href="<?php echo $continue; ?>" class="button"><?php echo $button_continue; ?></a></div>
+  </div>
+  <?php echo $content_bottom; ?></div>
 <?php echo $footer; ?>
