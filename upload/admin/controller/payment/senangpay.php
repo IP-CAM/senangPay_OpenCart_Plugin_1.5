@@ -38,6 +38,9 @@ class ControllerPaymentSenangpay extends Controller
         $this->data['button_save'] = $this->language->get('button_save');
         $this->data['button_cancel'] = $this->language->get('button_cancel');
 
+	$this->data['text_return_parameter_uri'] = $this->language->get('text_return_parameter_uri');
+	$this->data['help_copy_return_url'] = $this->language->get('help_copy_return_url');
+
         $this->data['breadcrumbs'] = array();
         $this->data['breadcrumbs'][] = array(
             'text' => $this->language->get('text_home'),
@@ -85,6 +88,8 @@ class ControllerPaymentSenangpay extends Controller
             $this->data['senangpay_order_fail_status_id'] = $this->request->post['senangpay_order_fail_status_id'];
         else
             $this->data['senangpay_order_fail_status_id'] = $this->config->get('senangpay_order_fail_status_id');
+
+	$this->data['senangpay_return_uri'] = 'http://'.$_SERVER['HTTP_HOST'].'/?route=payment/senangpay/callback&amp;';
 
         $this->load->model('localisation/order_status');
 

@@ -46,6 +46,15 @@
                                     <p>Contact Us For Additional Service: Email at idham@jomos.com.my or Whatsapp / telegram at 0196688147</p>
                                   </td>
                                 </tr>
+
+				<tr>
+
+				<td><?php echo $text_return_parameter_uri; ?></td>
+
+				<td><input type="text" size="50" value="<?php echo $senangpay_return_uri; ?>" disabled /> &nbsp; <?php echo $help_copy_return_url; ?></td> 
+
+
+				</tr>
                                 <tr>
                                   <td>
                                     <?php echo $entry_merchant_id; ?>
@@ -114,7 +123,16 @@
                                 </tr>
                                 <tr>
                                   <td></td>
-                                  <td>Develop By <a href="http://www.jomos.com.my">JOMos</a>
+                                  <td>Develop By <a href="http://www.jomos.com.my">JOMos</a></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td>If you find this plugin useful and you like to donate to us please bank into my maybank account at 1121 8404 4731 under Idham Hafidz Ismail. Thanks</td>
+				</tr>
+				<tr>
+				<td></td>
+				<td>version 1.1</td>
+				</tr>
                               </table>
                             </form>
                           </div>
