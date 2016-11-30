@@ -211,7 +211,8 @@ class ControllerPaymentSenangpay extends Controller
             }
         }
 
-        return 'OK';
+        //var_dump("ok");
+        echo "OK";
 
     }
 }
