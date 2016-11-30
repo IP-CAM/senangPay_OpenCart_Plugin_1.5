@@ -18,6 +18,23 @@ class ControllerPaymentSenangpay extends Controller
         $this->data['senangpay_amount'] = str_replace(',', '', $this->data['senangpay_amount']);
         $this->data['senangpay_hash'] = md5($this->config->get('senangpay_secret_key').$this->data['senangpay_detail'].$this->data['senangpay_amount'].$this->session->data['order_id']);
 
+        if(isset($this->session->data['guest']))
+        {
+            $this->data['senangpay_name'] = $this->session->data['guest']['firstname'].' '.$this->session->data['guest']['lastname'];
+            $this->data['senangpay_email'] = $this->session->data['guest']['email'];
+            $this->data['senangpay_phone'] = $this->session->data['guest']['telephone'];
+        } else {
+            $customerId = $this->session->data['customer_id'];
+            $this->data['senangpay_name'] = $this->customer->getFirstName().' '.$this->customer->getLastName();
+            $this->data['senangpay_email'] = $this->customer->getEmail();
+            $this->data['senangpay_phone'] = $this->customer->getTelephone();
+        }
+
+        //var_dump( 'senangpay_name: '.$this->data['senangpay_name'].' senangpay_email: '.$this->data['senangpay_email'].' senangpay_phone '.$this->data['senangpay_phone']  );
+        //echo '<pre>';
+        //var_dump( $this->customer  );
+        //echo '</pre>';
+
         /*if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/senangpay.tpl'))
             return $this->load->view($this->config->get('config_template') . '/template/payment/senangpay.tpl', $this->data);
         else
@@ -33,7 +50,7 @@ class ControllerPaymentSenangpay extends Controller
     }
 
     
-    public function callback()
+    public function processing()
     {
        
         $this->load->language('payment/senangpay');
@@ -74,15 +91,13 @@ class ControllerPaymentSenangpay extends Controller
             $order_info = $this->model_checkout_order->getOrder($order_id);
             if($order_info)
             {
-                $hash_value = md5($this->config->get('senangpay_secret_key').$status_id.$order_id.$transaction_id.$msg);
+                $hash_value = md5($this->config->get('senangpay_secret_key').'&status_id='.$status_id.'&order_id='.$order_id.'&transaction_id='.$transaction_id.'&msg='.$msg.'&hash=[HASH]');
+                //var_dump( $hash_value );
                 if($hash_value == $hash)
                 {
                     if($status_id == '1' || $status_id == 1)
                     {
                         $transaction_status = true;
-                         
-                        //todo: Need to fix this part
-                        /*$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id, false);*/
 
                         if (!$order_info['order_status_id']) {
                             $this->model_checkout_order->confirm($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
@@ -113,7 +128,13 @@ class ControllerPaymentSenangpay extends Controller
             }
 
             $this->data['continue'] = $this->url->link('checkout/cart');
-            $this->data['text_payment_status'] = $this->language->get('text_payment_failed');
+            $msg = urldecode($this->request->get['msg']);
+            if($msg == 'Minimum_transaction_amount_is_RM_2')
+            {
+                $this->data['text_payment_status'] = "We're sorry. Your order has fail. Minimum order must have total of RM 2";
+            } else {
+                $this->data['text_payment_status'] = $this->language->get('text_payment_failed');
+            }
             $this->data['color'] = 'red';
             $this->data['button_continue'] = $this->language->get('button_fail_continue');
         }
@@ -138,6 +159,59 @@ class ControllerPaymentSenangpay extends Controller
             );
                     
             $this->response->setOutput($this->render());
+
+    }
+
+
+    /*--------------------------------------------------------------------------------------------------------------------/    
+     *
+     *    @description   This will be a return callback by Senangpay. Senangpay will call this function through a callback url when there is order that was not processed correctly.
+     *    @author        Idham Hafidz JOMos    idham@jomos.com.my
+     */
+    public function callback()
+    {
+      
+        $transaction_status = false;
+
+        if(isset($this->request->get['status_id']) && isset($this->request->get['order_id']) && isset($this->request->get['msg']) && isset($this->request->get['transaction_id']) && isset($this->request->get['hash']))
+        {
+            $status_id = urldecode($this->request->get['status_id']);
+            $order_id = urldecode($this->request->get['order_id']);
+            $msg = urldecode($this->request->get['msg']);
+            $transaction_id = urldecode($this->request->get['transaction_id']);
+            $hash = urldecode($this->request->get['hash']);
+            
+            $this->load->model('checkout/order');
+            $order_info = $this->model_checkout_order->getOrder($order_id);
+            if($order_info)
+            {
+                $hash_value = md5($this->config->get('senangpay_secret_key').'&status_id='.$status_id.'&order_id='.$order_id.'&transaction_id='.$transaction_id.'&msg='.$msg.'&hash=[HASH]');
+                if($hash_value == $hash)
+                {
+                    if($status_id == '1' || $status_id == 1)
+                    {
+                        $transaction_status = true;
+
+                        if (!$order_info['order_status_id']) {
+                            $this->model_checkout_order->confirm($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+                        } else {
+                            $this->model_checkout_order->update($order_id, $this->config->get('senangpay_order_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+                        }
+                    } 
+                }
+            }
+        }
+        
+        if(!$transaction_status)
+        {
+            if (!$order_info['order_status_id']) {
+                $this->model_checkout_order->confirm($order_id, $this->config->get('senangpay_order_fail_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+            } else {
+                $this->model_checkout_order->update($order_id, $this->config->get('senangpay_order_fail_status_id'), 'Payment was made using senangPay. senangPay transaction id is '.$transaction_id);
+            }
+        }
+
+        return 'OK';
 
     }
 }

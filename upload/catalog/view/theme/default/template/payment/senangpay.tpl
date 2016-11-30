@@ -3,6 +3,9 @@
   <input type="hidden" name="amount" value="<?php echo $senangpay_amount; ?>" />
   <input type="hidden" name="order_id" value="<?php echo $senangpay_order_id; ?>" />
   <input type="hidden" name="hash" value="<?php echo $senangpay_hash; ?>" />
+  <input type="hidden" name="name" value="<?php echo $senangpay_name; ?>" />
+  <input type="hidden" name="email" value="<?php echo $senangpay_email; ?>" />
+  <input type="hidden" name="phone" value="<?php echo $senangpay_phone; ?>" />
   
   <div class="buttons">
     <div class="pull-right">

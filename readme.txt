@@ -27,9 +27,11 @@ THE SETUP
 2. Go to extension > payments and find senangPay and click "Install"
 3. After that find senangPay again and click "Edit senangPay"
 4. Find the fields to enter merchant-id and secret-key and fill in
-5. Set Order Status to "Processing" and Order Fail Status to "Failed"
-6. Enable it
-7. Save.
+5. ***"The merchant-id and secret-key is given to you in your senangpay account. You need to log-in and go to edit profile. Scroll down until you see it."***
+6. Copy the merchant-id and secret-key and paste them back in the right field.
+7. Set Order Status to "Processing" and Order Fail Status to "Failed"
+8. Enable it
+9. Save.
 
 That is all you need to do. Hopefully you get it.
 All the best in your online business.

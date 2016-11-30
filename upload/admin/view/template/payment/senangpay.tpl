@@ -49,12 +49,18 @@
 
 				<tr>
 
-				<td><?php echo $text_return_parameter_uri; ?></td>
+				<td>Return URL</td>
 
-				<td><input type="text" size="50" value="<?php echo $senangpay_return_uri; ?>" disabled /> &nbsp; <?php echo $help_copy_return_url; ?></td> 
-
-
+				<td><input type="text" size="50" value="<?php echo $senangpay_return_uri; ?>" /> &nbsp; <?php echo $help_copy_return_url; ?></td> 
+                </tr>
+                <tr>
+				<td>Callback URL</td>
+				<td><input type="text" size="50" value="<?php echo $senangpay_callback_uri; ?>" /> &nbsp; Copy this and paste it inside your "Callback URL" field inside your senangPay account</td> 
 				</tr>
+                <tr>
+				<td>Return URL Parameters</td>
+				<td><input type="text" size="100" value="&status_id=[TXN_STATUS]&order_id=[ORDER_ID]&transaction_id=[TXN_REF]&msg=[MSG]&hash=[HASH]" /> &nbsp; Copy and paste this inside your "Return URL Parameters" inside your senangPay account</td>
+                </tr>
                                 <tr>
                                   <td>
                                     <?php echo $entry_merchant_id; ?>
@@ -127,11 +133,11 @@
 				</tr>
 				<tr>
 				<td></td>
-				<td>If you find this plugin useful and you like to donate to us please bank into my maybank account at 1121 8404 4731 under Idham Hafidz Ismail. Thanks</td>
+				<td>If you find this plugin useful and you like to donate to us please bank into my maybank account at 5621 8831 1144 under JOM Online Services. Thanks</td>
 				</tr>
 				<tr>
 				<td></td>
-				<td>version 1.1</td>
+				<td>version 1.2</td>
 				</tr>
                               </table>
                             </form>

@@ -89,7 +89,14 @@ class ControllerPaymentSenangpay extends Controller
         else
             $this->data['senangpay_order_fail_status_id'] = $this->config->get('senangpay_order_fail_status_id');
 
-	$this->data['senangpay_return_uri'] = 'http://'.$_SERVER['HTTP_HOST'].'/?route=payment/senangpay/callback&amp;';
+        //SETTING THE RETURN AND CALLBACK URL//
+        $current_uri = 'http://'.$_SERVER['HTTP_HOST'].''.$_SERVER['REQUEST_URI'];
+        $var = explode('/admin/', $current_uri);
+        $beforeAdmin = $var[0];
+
+	    $this->data['senangpay_return_uri'] = $beforeAdmin.'/?route=payment/senangpay/processing';
+
+	    $this->data['senangpay_callback_uri'] = $beforeAdmin.'/?route=payment/senangpay/callback';
 
         $this->load->model('localisation/order_status');
 
