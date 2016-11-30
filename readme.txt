@@ -1,6 +1,6 @@
 senangPay OpenCart plugin for opencart version 1.5
 
-Version 1.0
+Version 1.2
 Author: idham hafidz 
 Email: idham@jomos.com.my
 website: www.jomos.com.my
@@ -16,7 +16,7 @@ REQUIREMENTS
 -------------------------
 HOW TO USE
 -------------------------
-1. Download the codes
+1. Download the codes ( Please download the latest code if you download from opencart marketplace )
 2. The codes are arrange in the correct folder structure. Simply copy them in the same folder structure
 3. To copy, simply drag and drop using FTP application like filezilla.
 
@@ -32,6 +32,15 @@ THE SETUP
 7. Set Order Status to "Processing" and Order Fail Status to "Failed"
 8. Enable it
 9. Save.
+10. Copy the return url, return url parameters and callback url to your senangpay. Return URL is the url where SenangPay will redirect once payment is done. The URL parameters is the parameter Senangpay will use when redirecting to your opencart store. The callback will be the url Senangpay will go if your customer did not go through all the payment process.
+The plugin already generate this for you. Simply copy and paste to its designated fields accordingly.
+
+-------------------------
+TEST
+-------------------------
+1. Create a dummy product. Make sure minimum charge for the product is RM2.
+2. Try and purchase the product. Make sure you go all the way.
+3. Check the status of the product ordered too. If everything goes well then you are good to go...
 
 That is all you need to do. Hopefully you get it.
 All the best in your online business.
